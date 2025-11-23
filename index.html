@@ -1,0 +1,1682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESP 0103 - Personal Protective Equipment</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            direction: ltr;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.95;
+        }
+
+        .progress-container {
+            background: #f8f9fa;
+            padding: 20px;
+            border-bottom: 3px solid #e9ecef;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #e9ecef;
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #56ccf2, #2f80ed);
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .score-display {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .score-item {
+            background: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin: 5px;
+        }
+
+        .score-item span {
+            font-weight: bold;
+            color: #2f80ed;
+            font-size: 1.2em;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .module {
+            display: none;
+        }
+
+        .module.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .module-title {
+            color: #2f80ed;
+            font-size: 1.8em;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .module-title .icon {
+            font-size: 1.5em;
+            margin-right: 15px;
+        }
+
+        .module-description {
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border-left: 4px solid #2f80ed;
+        }
+
+        .question {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s;
+        }
+
+        .question:hover {
+            border-color: #2f80ed;
+            box-shadow: 0 5px 15px rgba(47,128,237,0.1);
+        }
+
+        .question-text {
+            font-size: 1.15em;
+            margin-bottom: 15px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .arabic-hint {
+            color: #6c757d;
+            font-size: 0.9em;
+            font-style: italic;
+            margin-top: 5px;
+        }
+
+        .options {
+            display: grid;
+            gap: 10px;
+        }
+
+        .option {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px solid #dee2e6;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+        }
+
+        .option:hover {
+            border-color: #2f80ed;
+            transform: translateX(5px);
+        }
+
+        .option input[type="radio"] {
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        .option.selected {
+            background: #e7f3ff;
+            border-color: #2f80ed;
+        }
+
+        .option.correct {
+            background: #d4edda;
+            border-color: #28a745;
+        }
+
+        .option.incorrect {
+            background: #f8d7da;
+            border-color: #dc3545;
+        }
+
+        .input-answer {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        .input-answer:focus {
+            outline: none;
+            border-color: #2f80ed;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            margin: 10px 5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102,126,234,0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #56ccf2 0%, #2f80ed 100%);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(47,128,237,0.4);
+        }
+
+        .btn-reset {
+            background: linear-gradient(135deg, #f5576c 0%, #f093fb 100%);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            margin: 10px 5px;
+        }
+
+        .btn-reset:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(245,87,108,0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .feedback {
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            display: none;
+            animation: slideIn 0.3s;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-10px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .feedback.show {
+            display: block;
+        }
+
+        .feedback.success {
+            background: #d4edda;
+            border: 2px solid #28a745;
+            color: #155724;
+        }
+
+        .feedback.error {
+            background: #f8d7da;
+            border: 2px solid #dc3545;
+            color: #721c24;
+        }
+
+        .feedback.warning {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            color: #856404;
+        }
+
+        .module-locked {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .module-locked .lock-icon {
+            font-size: 4em;
+            color: #6c757d;
+            margin-bottom: 20px;
+        }
+
+        .module-locked h3 {
+            color: #6c757d;
+            margin-bottom: 10px;
+        }
+
+        .certificate {
+            text-align: center;
+            padding: 40px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+
+        .certificate h2 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+
+        .certificate-content {
+            background: white;
+            color: #333;
+            padding: 40px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 5px solid #f5576c;
+        }
+
+        .certificate-title {
+            font-size: 2em;
+            color: #f5576c;
+            margin-bottom: 20px;
+        }
+
+        .reading-passage {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            border: 2px solid #dee2e6;
+            margin-bottom: 30px;
+            line-height: 1.8;
+        }
+
+        .reading-passage h3 {
+            color: #2f80ed;
+            margin-bottom: 15px;
+        }
+
+        .reading-passage p {
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+
+        .drag-drop-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .drag-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            min-height: 100px;
+        }
+
+        .drag-item {
+            padding: 10px 15px;
+            background: white;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            cursor: move;
+            transition: all 0.3s;
+        }
+
+        .drag-item:hover {
+            transform: scale(1.05);
+            border-color: #2f80ed;
+        }
+
+        .drop-zone {
+            padding: 20px;
+            background: #e7f3ff;
+            border: 2px dashed #2f80ed;
+            border-radius: 10px;
+            min-height: 150px;
+        }
+
+        .drop-zone h4 {
+            color: #2f80ed;
+            margin-bottom: 15px;
+        }
+
+        .textarea-large {
+            width: 100%;
+            min-height: 200px;
+            padding: 15px;
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            font-size: 1em;
+            font-family: inherit;
+            resize: vertical;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: bold;
+            margin: 5px;
+        }
+
+        .badge-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .badge-locked {
+            background: #e9ecef;
+            color: #6c757d;
+        }
+
+        .matching-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .matching-item {
+            background: white;
+            padding: 15px;
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .matching-item:hover {
+            border-color: #2f80ed;
+        }
+
+        .matching-item.selected {
+            background: #e7f3ff;
+            border-color: #2f80ed;
+        }
+
+        @media (max-width: 768px) {
+            .drag-drop-container,
+            .matching-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 1.5em;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+
+            .module-nav {
+                flex-direction: column;
+            }
+
+            .module-nav > div[style*="flex-grow"] {
+                display: none;
+            }
+        }
+
+        .start-screen {
+            text-align: center;
+            padding: 60px 40px;
+        }
+
+        .start-screen h2 {
+            color: #2f80ed;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+
+        .start-screen .welcome-text {
+            font-size: 1.2em;
+            color: #6c757d;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .student-name-input {
+            width: 100%;
+            max-width: 400px;
+            padding: 15px;
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            font-size: 1.1em;
+            margin: 20px auto;
+            display: block;
+        }
+
+        .module-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #e9ecef;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .fill-blank-input {
+            display: inline-block;
+            min-width: 150px;
+            padding: 5px 10px;
+            border: none;
+            border-bottom: 2px solid #2f80ed;
+            font-size: 1em;
+            margin: 0 5px;
+            background: transparent;
+        }
+
+        .fill-blank-input:focus {
+            outline: none;
+            background: #e7f3ff;
+        }
+
+        .flashcards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .flashcard {
+            perspective: 1000px;
+            height: 300px;
+            cursor: pointer;
+        }
+
+        .flashcard-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+
+        .flashcard.flipped .flashcard-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flashcard-front, .flashcard-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 15px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .flashcard-front {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .flashcard-back {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            transform: rotateY(180deg);
+        }
+
+        .flashcard-word {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .flashcard-icon {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+
+        .flashcard-hint {
+            font-size: 0.9em;
+            opacity: 0.9;
+            margin-top: 15px;
+        }
+
+        .flashcard-arabic {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .flashcard-example {
+            font-size: 1em;
+            line-height: 1.6;
+            margin-top: 15px;
+            font-style: italic;
+        }
+
+        .section-divider {
+            margin: 40px 0;
+            text-align: center;
+        }
+
+        .section-divider hr {
+            border: none;
+            border-top: 2px solid #dee2e6;
+            margin: 20px 0;
+        }
+
+        .section-title {
+            background: linear-gradient(135deg, #56ccf2 0%, #2f80ed 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 1.3em;
+            font-weight: bold;
+            display: inline-block;
+        }
+
+        .quiz-section {
+            display: none;
+        }
+
+        .quiz-section.active {
+            display: block;
+        }
+
+        .instruction-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .instruction-box strong {
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚡ ESP 0103 - Personal Protective Equipment ⚡</h1>
+            <p>Lesson 16 | Higher Colleges of Technology</p>
+            <p style="font-size: 0.9em; margin-top: 10px;">Designed by: Nazila Motahari</p>
+        </div>
+
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%">0%</div>
+            </div>
+            <div class="score-display">
+                <div class="score-item">
+                    📊 Total Points: <span id="totalPoints">0</span>
+                </div>
+                <div class="score-item">
+                    ⭐ Modules Completed: <span id="modulesCompleted">0/7</span>
+                </div>
+                <div class="score-item">
+                    🎯 Current Module: <span id="currentModuleName">Welcome</span>
+                </div>
+                <button class="btn btn-reset" onclick="restartLesson()" id="resetButton" style="display: none;">
+                    🔄 Reset Lesson
+                </button>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- Start Screen -->
+            <div id="startScreen" class="module active">
+                <div class="start-screen">
+                    <h2>🎓 Welcome to Personal Protective Equipment Training!</h2>
+                    <div class="welcome-text">
+                        <p>In this interactive lesson, you will learn about:</p>
+                        <ul style="text-align: left; max-width: 600px; margin: 20px auto; line-height: 2;">
+                            <li>✅ Essential PPE for electrical engineers</li>
+                            <li>✅ Electrical tools and equipment vocabulary</li>
+                            <li>✅ Present Simple tense for technical descriptions</li>
+                            <li>✅ Safety procedures and practices</li>
+                            <li>✅ Reading comprehension skills</li>
+                        </ul>
+                        <p style="margin-top: 30px;"><strong>📝 Important:</strong> You must score at least <span style="color: #f5576c; font-size: 1.2em;">85%</span> in each module to unlock the next one!</p>
+                    </div>
+                    <input type="text" id="studentName" class="student-name-input" placeholder="Enter your name (اسمك)" required>
+                    <input type="text" id="teacherName" class="student-name-input" placeholder="Enter your teacher's name (اسم معلمك)">
+                    <p style="color: #6c757d; font-size: 0.9em; margin-top: 10px;">💡 If you don't enter a teacher name, we'll use "Nazila Motahari" / إذا لم تدخل اسم المعلم، سنستخدم "نزيلة مطهري"</p>
+                    <button class="btn btn-primary" onclick="startLesson()">🚀 Begin Lesson</button>
+                </div>
+            </div>
+
+            <!-- Module 1: Vocabulary - Picture Word Matching -->
+            <div id="module1" class="module">
+                <h2 class="module-title"><span class="icon">📚</span> Module 1: Vocabulary - Learn PPE and Tools</h2>
+                <div class="module-description">
+                    <p><strong>Objective:</strong> Learn essential PPE and electrical tools vocabulary with meanings and examples.</p>
+                    <p class="arabic-hint">الهدف: تعلم مفردات أساسية عن معدات الوقاية والأدوات الكهربائية مع المعاني والأمثلة</p>
+                </div>
+
+                <div class="instruction-box">
+                    <strong>📖 How to use:</strong> Click on each flashcard to flip it and see the Arabic meaning and example sentence. Review all cards before starting the quiz!
+                    <br><strong>كيفية الاستخدام:</strong> انقر على كل بطاقة لقلبها ورؤية المعنى بالعربية والجملة المثالية
+                </div>
+
+                <div id="flashcardsSection">
+                    <div class="flashcards-container" id="flashcardsContainer"></div>
+                </div>
+
+                <div class="section-divider">
+                    <hr>
+                    <div class="section-title">📝 Now Test Your Knowledge! / الآن اختبر معرفتك!</div>
+                    <hr>
+                </div>
+
+                <div id="quizSection" class="quiz-section">
+                    <div class="module-description" style="background: #e7f3ff;">
+                        <p><strong>Quiz Instructions:</strong> Match the words with the correct definitions. You need 85% to proceed.</p>
+                        <p class="arabic-hint">تعليمات الاختبار: طابق الكلمات مع التعريفات الصحيحة. تحتاج 85٪ للمتابعة</p>
+                    </div>
+                    
+                    <div id="module1Questions"></div>
+
+                    <div class="feedback" id="module1Feedback"></div>
+                    
+                    <div class="module-nav">
+                        <button class="btn btn-primary" onclick="checkModule1()">✅ Check Answers</button>
+                        <button class="btn btn-success" id="module1Next" onclick="nextModule(2)" disabled>Next Module →</button>
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin-top: 30px;" id="startQuizBtn">
+                    <button class="btn btn-primary" onclick="startModule1Quiz()">🎯 Start Quiz</button>
+                </div>
+            </div>
+
+            <!-- Module 2: Definitions Matching -->
+            <div id="module2" class="module">
+                <h2 class="module-title"><span class="icon">📖</span> Module 2: Vocabulary - Definitions</h2>
+                <div class="module-description">
+                    <p><strong>Objective:</strong> Match PPE vocabulary words with their definitions.</p>
+                    <p class="arabic-hint">الهدف: مطابقة مفردات معدات الوقاية مع تعريفاتها</p>
+                </div>
+
+                <div id="module2Questions"></div>
+
+                <div class="feedback" id="module2Feedback"></div>
+                
+                <div class="module-nav">
+                    <button class="btn btn-primary" onclick="previousModule(1)">← Previous Module</button>
+                    <div style="flex-grow: 1;"></div>
+                    <button class="btn btn-primary" onclick="checkModule2()">✅ Check Answers</button>
+                    <button class="btn btn-success" id="module2Next" onclick="nextModule(3)" disabled>Next Module →</button>
+                </div>
+            </div>
+
+            <!-- Module 3: Example Sentences -->
+            <div id="module3" class="module">
+                <h2 class="module-title"><span class="icon">✍️</span> Module 3: Using Words in Context</h2>
+                <div class="module-description">
+                    <p><strong>Objective:</strong> Complete sentences with the correct vocabulary words.</p>
+                    <p class="arabic-hint">الهدف: إكمال الجمل بالكلمات الصحيحة</p>
+                </div>
+
+                <div id="module3Questions"></div>
+
+                <div class="feedback" id="module3Feedback"></div>
+                
+                <div class="module-nav">
+                    <button class="btn btn-primary" onclick="previousModule(2)">← Previous Module</button>
+                    <div style="flex-grow: 1;"></div>
+                    <button class="btn btn-primary" onclick="checkModule3()">✅ Check Answers</button>
+                    <button class="btn btn-success" id="module3Next" onclick="nextModule(4)" disabled>Next Module →</button>
+                </div>
+            </div>
+
+            <!-- Module 4: Grammar - Present Simple -->
+            <div id="module4" class="module">
+                <h2 class="module-title"><span class="icon">⚙️</span> Module 4: Grammar - Present Simple Tense</h2>
+                <div class="module-description">
+                    <p><strong>Objective:</strong> Practice the Present Simple tense with electrical engineering contexts.</p>
+                    <p class="arabic-hint">الهدف: التدرب على زمن المضارع البسيط في سياق الهندسة الكهربائية</p>
+                </div>
+
+                <div style="background: #e7f3ff; padding: 20px; border-radius: 10px; margin-bottom: 30px;">
+                    <h3 style="color: #2f80ed;">📝 Grammar Rules:</h3>
+                    <ul style="line-height: 2;">
+                        <li><strong>Affirmative:</strong> Subject + base verb (+s/es for he/she/it)</li>
+                        <li><strong>Negative:</strong> Subject + do/does not + base verb</li>
+                        <li><strong>Question:</strong> Do/Does + subject + base verb?</li>
+                    </ul>
+                </div>
+
+                <div id="module4Questions"></div>
+
+                <div class="feedback" id="module4Feedback"></div>
+                
+                <div class="module-nav">
+                    <button class="btn btn-primary" onclick="previousModule(3)">← Previous Module</button>
+                    <div style="flex-grow: 1;"></div>
+                    <button class="btn btn-primary" onclick="checkModule4()">✅ Check Answers</button>
+                    <button class="btn btn-success" id="module4Next" onclick="nextModule(5)" disabled>Next Module →</button>
+                </div>
+            </div>
+
+            <!-- Module 5: Reading Comprehension -->
+            <div id="module5" class="module">
+                <h2 class="module-title"><span class="icon">📄</span> Module 5: Reading Comprehension</h2>
+                <div class="module-description">
+                    <p><strong>Objective:</strong> Read about safety equipment and answer comprehension questions.</p>
+                    <p class="arabic-hint">الهدف: قراءة نص عن معدات السلامة والإجابة على أسئلة الفهم</p>
+                </div>
+
+                <div class="reading-passage">
+                    <h3>Safety Equipment and Tools for Electricians</h3>
+                    <p>Electricians work with electricity to install, repair, and maintain electrical systems in homes, buildings, and factories. Because electricity can be dangerous, electricians must follow safety rules and use special equipment to protect themselves.</p>
+                    
+                    <p>Before starting any electrical work, electricians wear Personal Protective Equipment (PPE). PPE includes items that protect different parts of the body. A helmet protects the head from falling objects. Gloves protect the hands from sharp tools and electric shock. Goggles protect the eyes from dust, sparks, or flying pieces of wire. In noisy environments, electricians wear ear protection to reduce loud sounds. These items help electricians stay safe while working.</p>
+                    
+                    <p>Electricians also look for warning signs that show danger. For example, a sign that says "High Voltage" means there is strong electricity in the area. Electricians must be careful and check wires before touching them.</p>
+                    
+                    <p>To do their job, electricians use many tools. A screwdriver is used to open electrical boxes and tighten screws. Pliers help hold and bend wires. A tester checks if electricity is flowing through a wire. A wire cutter is used to cut wires safely. These tools are important for fixing and installing electrical systems.</p>
+                    
+                    <p>Safety is always the first step in electrical work. Electricians must wear the correct PPE, use the right tools, and check for danger before they begin. By following these steps, they can do their job well and avoid accidents.</p>
+                </div>
+
+                <div id="module5Questions"></div>
+
+                <div class="feedback" id="module5Feedback"></div>
+                
+                <div class="module-nav">
+                    <button class="btn btn-primary" onclick="previousModule(4)">← Previous Module</button>
+                    <div style="flex-grow: 1;"></div>
+                    <button class="btn btn-primary" onclick="checkModule5()">✅ Check Answers</button>
+                    <button class="btn btn-success" id="module5Next" onclick="nextModule(6)" disabled>Next Module →</button>
+                </div>
+            </div>
+
+            <!-- Module 6: Final Writing Task -->
+            <div id="module6" class="module">
+                <h2 class="module-title"><span class="icon">✏️</span> Module 6: Writing - Electrician's Daily Routine</h2>
+                <div class="module-description">
+                    <p><strong>Objective:</strong> Write a paragraph describing an electrician's daily routine using vocabulary and grammar from this lesson.</p>
+                    <p class="arabic-hint">الهدف: كتابة فقرة تصف روتين كهربائي يومي باستخدام المفردات والقواعد من هذا الدرس</p>
+                </div>
+
+                <div style="background: #fff3cd; padding: 20px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #ffc107;">
+                    <h4>💡 Writing Tips:</h4>
+                    <ul style="line-height: 2;">
+                        <li>Use Present Simple tense</li>
+                        <li>Include at least 5 PPE items or tools</li>
+                        <li>Describe what the electrician wears and uses</li>
+                        <li>Mention safety procedures</li>
+                        <li>Write at least 80 words</li>
+                    </ul>
+                </div>
+
+                <textarea id="writingAnswer" class="textarea-large" placeholder="Write your paragraph here... (اكتب فقرتك هنا)"></textarea>
+                
+                <div class="feedback" id="module6Feedback"></div>
+                
+                <div class="module-nav">
+                    <button class="btn btn-primary" onclick="previousModule(5)">← Previous Module</button>
+                    <div style="flex-grow: 1;"></div>
+                    <button class="btn btn-primary" onclick="checkModule6()">✅ Submit Writing</button>
+                    <button class="btn btn-success" id="module6Next" onclick="nextModule(7)" disabled>Complete Lesson →</button>
+                </div>
+            </div>
+
+            <!-- Certificate -->
+            <div id="module7" class="module">
+                <div class="certificate">
+                    <h2>🎉 Congratulations! 🎉</h2>
+                    <div class="certificate-content">
+                        <div class="certificate-title">Certificate of Completion</div>
+                        <p style="font-size: 1.3em; margin: 20px 0;">This certifies that</p>
+                        <h3 style="color: #f5576c; font-size: 2em; margin: 20px 0;" id="certificateName"></h3>
+                        <p style="font-size: 1.2em; margin: 20px 0;">has successfully completed</p>
+                        <h4 style="color: #2f80ed; font-size: 1.5em; margin: 20px 0;">ESP 0103 - Personal Protective Equipment<br>Lesson 16</h4>
+                        <p style="margin: 20px 0;">with a total score of</p>
+                        <div style="font-size: 2.5em; color: #28a745; font-weight: bold; margin: 20px 0;" id="finalScore"></div>
+                        <p style="margin-top: 30px; color: #6c757d;">Higher Colleges of Technology</p>
+                        <p style="color: #6c757d;">Instructor: <span id="certificateTeacher"></span></p>
+                        <p style="color: #6c757d; margin-top: 20px;" id="certificateDate"></p>
+                    </div>
+                    <button class="btn btn-primary" onclick="downloadCertificate()" style="margin-top: 20px;">📥 Download Certificate</button>
+                    <button class="btn btn-success" onclick="previousModule(1)" style="margin-top: 20px;">📚 Review Lessons</button>
+                    <button class="btn btn-reset" onclick="restartLesson()" style="margin-top: 20px;">🔄 Restart Lesson</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let studentName = '';
+        let teacherName = '';
+        let currentModule = 0;
+        let moduleScores = {
+            module1: { completed: false, score: 0, attempts: 0 },
+            module2: { completed: false, score: 0, attempts: 0 },
+            module3: { completed: false, score: 0, attempts: 0 },
+            module4: { completed: false, score: 0, attempts: 0 },
+            module5: { completed: false, score: 0, attempts: 0 },
+            module6: { completed: false, score: 0, attempts: 0 }
+        };
+
+        // Module 1 Data
+        const module1Data = [
+            { question: "What protects your head from falling objects?", options: ["Gloves", "Helmet", "Goggles", "Wire cutter"], answer: 1, arabic: "ما الذي يحمي رأسك من الأشياء الساقطة؟" },
+            { question: "What do you wear to protect your eyes?", options: ["Helmet", "Ear protection", "Goggles", "Gloves"], answer: 2, arabic: "ماذا ترتدي لحماية عينيك؟" },
+            { question: "What tool cuts wires safely?", options: ["Screwdriver", "Pliers", "Wire cutter", "Tester"], answer: 2, arabic: "أي أداة تقطع الأسلاك بأمان؟" },
+            { question: "What provides light when electricity flows?", options: ["Switch", "Bulb", "Battery", "Circuit"], answer: 1, arabic: "ما الذي يوفر الضوء عندما تتدفق الكهرباء؟" },
+            { question: "What protects your hands?", options: ["Goggles", "Gloves", "Helmet", "Ear protection"], answer: 1, arabic: "ما الذي يحمي يديك؟" },
+            { question: "What checks if electricity is flowing?", options: ["Screwdriver", "Tester", "Pliers", "Wire cutter"], answer: 1, arabic: "ما الذي يفحص تدفق الكهرباء؟" },
+            { question: "What turns electricity on or off?", options: ["Bulb", "Switch", "Wire", "Battery"], answer: 1, arabic: "ما الذي يشغل أو يطفئ الكهرباء؟" },
+            { question: "What protects ears in noisy places?", options: ["Helmet", "Goggles", "Ear protection", "Gloves"], answer: 2, arabic: "ما الذي يحمي الأذنين في الأماكن الصاخبة؟" }
+        ];
+
+        // Flashcard Data for Module 1 (Alphabetical Order)
+        const flashcardData = [
+            {
+                word: "Battery",
+                icon: "🔋",
+                arabic: "بطارية",
+                example: "The battery gives power to small electrical devices.",
+                exampleArabic: "توفر البطارية الطاقة للأجهزة الكهربائية الصغيرة"
+            },
+            {
+                word: "Bulb",
+                icon: "💡",
+                arabic: "مصباح كهربائي",
+                example: "The bulb lights up when electricity flows through the circuit.",
+                exampleArabic: "يضيء المصباح عندما تتدفق الكهرباء عبر الدائرة"
+            },
+            {
+                word: "Circuit",
+                icon: "🔄",
+                arabic: "دائرة كهربائية",
+                example: "A circuit is a complete path that electricity follows to power devices.",
+                exampleArabic: "الدائرة الكهربائية هي مسار كامل تتبعه الكهرباء لتشغيل الأجهزة"
+            },
+            {
+                word: "Danger",
+                icon: "☠️",
+                arabic: "خطر",
+                example: "Electricity can be a danger if you do not follow safety rules.",
+                exampleArabic: "يمكن أن تكون الكهرباء خطراً إذا لم تتبع قواعد السلامة"
+            },
+            {
+                word: "Ear Protection",
+                icon: "🎧",
+                arabic: "حماية الأذن",
+                example: "He uses ear protection in noisy environments to reduce loud sounds.",
+                exampleArabic: "يستخدم حماية الأذن في البيئات الصاخبة لتقليل الأصوات العالية"
+            },
+            {
+                word: "Gloves",
+                icon: "🧤",
+                arabic: "قفازات",
+                example: "Gloves protect the hands from electric shock and sharp tools.",
+                exampleArabic: "تحمي القفازات اليدين من الصدمات الكهربائية والأدوات الحادة"
+            },
+            {
+                word: "Goggles",
+                icon: "🥽",
+                arabic: "نظارات واقية",
+                example: "She wears goggles to protect her eyes from dust and sparks.",
+                exampleArabic: "ترتدي نظارات واقية لحماية عينيها من الغبار والشرر"
+            },
+            {
+                word: "Helmet",
+                icon: "🪖",
+                arabic: "خوذة",
+                example: "An electrician always wears a helmet to protect the head from falling objects.",
+                exampleArabic: "يرتدي الكهربائي دائمًا خوذة لحماية الرأس من الأشياء الساقطة"
+            },
+            {
+                word: "Pliers",
+                icon: "🔨",
+                arabic: "كماشة",
+                example: "Pliers help electricians hold and bend wires carefully.",
+                exampleArabic: "تساعد الكماشة الكهربائيين على إمساك الأسلاك وثنيها بعناية"
+            },
+            {
+                word: "Safe",
+                icon: "✅",
+                arabic: "آمن",
+                example: "Wearing PPE keeps electricians safe while they work.",
+                exampleArabic: "ارتداء معدات الوقاية يبقي الكهربائيين آمنين أثناء العمل"
+            },
+            {
+                word: "Screwdriver",
+                icon: "🔧",
+                arabic: "مفك براغي",
+                example: "I use a screwdriver to open electrical boxes and tighten screws.",
+                exampleArabic: "أستخدم مفك البراغي لفتح الصناديق الكهربائية وشد البراغي"
+            },
+            {
+                word: "Sign",
+                icon: "⚠️",
+                arabic: "إشارة / لافتة",
+                example: "A sign that says 'High Voltage' gives a warning about danger.",
+                exampleArabic: "إشارة تقول 'جهد عالي' تعطي تحذيراً عن الخطر"
+            },
+            {
+                word: "Switch",
+                icon: "🔘",
+                arabic: "مفتاح كهربائي",
+                example: "Press the switch to turn the fan on or off.",
+                exampleArabic: "اضغط على المفتاح لتشغيل المروحة أو إيقافها"
+            },
+            {
+                word: "Tester",
+                icon: "🔌",
+                arabic: "جهاز اختبار",
+                example: "The tester checks if electricity is flowing through the wire.",
+                exampleArabic: "يفحص جهاز الاختبار ما إذا كانت الكهرباء تتدفق عبر السلك"
+            },
+            {
+                word: "Wire",
+                icon: "〰️",
+                arabic: "سلك كهربائي",
+                example: "A wire carries electricity from the battery to the device.",
+                exampleArabic: "ينقل السلك الكهرباء من البطارية إلى الجهاز"
+            },
+            {
+                word: "Wire Cutter",
+                icon: "✂️",
+                arabic: "قاطع أسلاك",
+                example: "A wire cutter is used to cut wires safely before connecting them.",
+                exampleArabic: "يستخدم قاطع الأسلاك لقطع الأسلاك بأمان قبل توصيلها"
+            }
+        ];
+
+        // Module 2 Data
+        const module2Data = [
+            { question: "A hard hat that protects your head", answer: "helmet", arabic: "خوذة صلبة تحمي رأسك" },
+            { question: "Coverings for your hands to keep them safe", answer: "gloves", arabic: "أغطية ليديك لحمايتهما" },
+            { question: "Glasses that protect your eyes", answer: "goggles", arabic: "نظارات تحمي عينيك" },
+            { question: "Covers for your ears to block loud noise", answer: "ear protection", arabic: "أغطية لأذنيك لحجب الضوضاء العالية" },
+            { question: "A picture or words that give a warning or information", answer: "sign", arabic: "صورة أو كلمات تعطي تحذيراً أو معلومات" },
+            { question: "Something that can hurt you", answer: "danger", arabic: "شيء يمكن أن يؤذيك" },
+            { question: "Not dangerous; protected from harm", answer: "safe", arabic: "غير خطير؛ محمي من الأذى" }
+        ];
+
+        // Module 3 Data
+        const module3Data = [
+            { sentence: "I use a ___ to open the cover of the light switch.", options: ["screwdriver", "pliers", "wire cutter", "tester"], answer: 0 },
+            { sentence: "The ___ help me hold the wire while I connect it.", options: ["screwdriver", "pliers", "wire cutter", "tester"], answer: 1 },
+            { sentence: "I check the wire with a ___ to see if electricity is flowing.", options: ["circuit tester", "screwdriver", "wire cutter", "pliers"], answer: 0 },
+            { sentence: "A ___ carries electricity from the battery to the bulb.", options: ["switch", "wire", "bulb", "fan"], answer: 1 },
+            { sentence: "The ___ lights up when the circuit is complete.", options: ["wire", "switch", "bulb", "battery"], answer: 2 },
+            { sentence: "Press the ___ to turn the fan on or off.", options: ["switch", "bulb", "wire", "circuit"], answer: 0 },
+            { sentence: "The ___ spins and makes the air cool when the switch is turned on.", options: ["light", "bulb", "fan", "battery"], answer: 2 },
+            { sentence: "___ moves through wires and makes machines work.", options: ["Light", "Electricity", "Battery", "Switch"], answer: 1 }
+        ];
+
+        // Module 4 Data
+        const module4Data = [
+            { sentence: "The goggles ___ (protect) the eyes from dust and sparks.", answer: "protect" },
+            { sentence: "He ___ (not/use) a wire cutter for thick cables.", answer: "does not use|doesn't use" },
+            { sentence: "___ (you/check) for danger signs before you begin?", answer: "Do you check" },
+            { sentence: "I ___ (not/wear) ear protection in quiet places.", answer: "do not wear|don't wear" },
+            { sentence: "___ (she/use) a screwdriver to open the box?", answer: "Does she use" },
+            { sentence: "He ___ (carry) a tester to check if electricity is in the wire.", answer: "carries" },
+            { sentence: "An electrician always ___ (wear) a helmet and gloves.", answer: "wears" },
+            { sentence: "She ___ (fix) lights and fans in homes and schools.", answer: "fixes" },
+            { sentence: "We ___ (work) in buildings and factories.", answer: "work" },
+            { sentence: "They ___ (not/turn off) the electricity without checking the wires.", answer: "do not turn off|don't turn off" }
+        ];
+
+        // Module 5 Data
+        const module5Data = [
+            {
+                question: "Why is Personal Protective Equipment (PPE) important for electricians?",
+                options: [
+                    "It helps them carry tools more easily",
+                    "It protects them from dangers like electric shock and falling objects",
+                    "It makes their work faster",
+                    "It helps them find wires"
+                ],
+                answer: 1
+            },
+            {
+                question: "What might happen if an electrician ignores a 'High Voltage' sign?",
+                options: [
+                    "They will finish their work quickly",
+                    "They will need more tools",
+                    "They could get hurt by strong electricity",
+                    "They will turn off the electricity"
+                ],
+                answer: 2
+            },
+            {
+                question: "How does a tester help an electrician stay safe?",
+                options: [
+                    "It cuts wires safely",
+                    "It protects the electrician's eyes",
+                    "It tightens screws in electrical boxes",
+                    "It shows if electricity is flowing in a wire"
+                ],
+                answer: 3
+            },
+            {
+                question: "What is the main purpose of a circuit in electrical work?",
+                options: [
+                    "To provide a path for electricity to flow",
+                    "To store electricity for later use",
+                    "To turn electricity on and off",
+                    "To protect the electrician's hands"
+                ],
+                answer: 0
+            },
+            {
+                question: "Why do electricians need ear protection in some environments?",
+                options: [
+                    "To hear instructions better",
+                    "To reduce loud sounds that could harm their ears",
+                    "To keep their ears warm",
+                    "To block out all sounds completely"
+                ],
+                answer: 1
+            }
+        ];
+
+        function startLesson() {
+            studentName = document.getElementById('studentName').value.trim();
+            if (!studentName) {
+                alert('Please enter your name before starting! / الرجاء إدخال اسمك قبل البدء!');
+                return;
+            }
+            
+            // Get teacher name (optional, default to "Nazila Motahari")
+            teacherName = document.getElementById('teacherName').value.trim();
+            if (!teacherName) {
+                teacherName = 'Nazila Motahari';
+            }
+            
+            currentModule = 1;
+            showModule(1);
+            updateProgress();
+            initializeModules();
+            
+            // Show reset button
+            document.getElementById('resetButton').style.display = 'block';
+        }
+
+        function initializeModules() {
+            // Initialize Module 1 - Flashcards
+            let flashcardsHTML = '';
+            flashcardData.forEach((card, index) => {
+                flashcardsHTML += `
+                    <div class="flashcard" onclick="flipCard(${index})">
+                        <div class="flashcard-inner" id="flashcard${index}">
+                            <div class="flashcard-front">
+                                <div class="flashcard-icon">${card.icon}</div>
+                                <div class="flashcard-word">${card.word}</div>
+                                <div class="flashcard-hint">👆 Click to see meaning and example<br>انقر لرؤية المعنى والمثال</div>
+                            </div>
+                            <div class="flashcard-back">
+                                <div class="flashcard-arabic">${card.arabic}</div>
+                                <div class="flashcard-example">"${card.example}"</div>
+                                <div style="font-size: 0.9em; margin-top: 10px; opacity: 0.9;">${card.exampleArabic}</div>
+                                <div class="flashcard-hint" style="margin-top: 20px;">👆 Click to flip back<br>انقر للعودة</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            document.getElementById('flashcardsContainer').innerHTML = flashcardsHTML;
+
+            // Initialize Module 1 - Quiz Questions
+            let html = '';
+            module1Data.forEach((item, index) => {
+                html += `
+                    <div class="question">
+                        <div class="question-text">${index + 1}. ${item.question}</div>
+                        <div class="arabic-hint">${item.arabic}</div>
+                        <div class="options">
+                            ${item.options.map((opt, i) => `
+                                <label class="option" data-question="${index}" data-option="${i}">
+                                    <input type="radio" name="q${index}" value="${i}">
+                                    ${opt}
+                                </label>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            });
+            document.getElementById('module1Questions').innerHTML = html;
+
+            // Initialize Module 2
+            html = '';
+            module2Data.forEach((item, index) => {
+                html += `
+                    <div class="question">
+                        <div class="question-text">${index + 1}. ${item.question}</div>
+                        <div class="arabic-hint">${item.arabic}</div>
+                        <input type="text" class="input-answer" id="m2q${index}" placeholder="Type your answer... (اكتب إجابتك)">
+                    </div>
+                `;
+            });
+            document.getElementById('module2Questions').innerHTML = html;
+
+            // Initialize Module 3
+            html = '';
+            module3Data.forEach((item, index) => {
+                html += `
+                    <div class="question">
+                        <div class="question-text">${index + 1}. ${item.sentence}</div>
+                        <div class="options">
+                            ${item.options.map((opt, i) => `
+                                <label class="option" data-question="${index}" data-option="${i}">
+                                    <input type="radio" name="m3q${index}" value="${i}">
+                                    ${opt}
+                                </label>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            });
+            document.getElementById('module3Questions').innerHTML = html;
+
+            // Initialize Module 4
+            html = '';
+            module4Data.forEach((item, index) => {
+                html += `
+                    <div class="question">
+                        <div class="question-text">${index + 1}. ${item.sentence}</div>
+                        <input type="text" class="input-answer" id="m4q${index}" placeholder="Write the correct verb form... (اكتب الفعل الصحيح)">
+                    </div>
+                `;
+            });
+            document.getElementById('module4Questions').innerHTML = html;
+
+            // Initialize Module 5
+            html = '';
+            module5Data.forEach((item, index) => {
+                html += `
+                    <div class="question">
+                        <div class="question-text">${index + 1}. ${item.question}</div>
+                        <div class="options">
+                            ${item.options.map((opt, i) => `
+                                <label class="option" data-question="${index}" data-option="${i}">
+                                    <input type="radio" name="m5q${index}" value="${i}">
+                                    ${opt}
+                                </label>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            });
+            document.getElementById('module5Questions').innerHTML = html;
+
+            // Add click handlers for options
+            document.querySelectorAll('.option').forEach(opt => {
+                opt.addEventListener('click', function() {
+                    const radio = this.querySelector('input[type="radio"]');
+                    radio.checked = true;
+                    const questionIndex = this.dataset.question;
+                    document.querySelectorAll(`[data-question="${questionIndex}"]`).forEach(o => {
+                        o.classList.remove('selected');
+                    });
+                    this.classList.add('selected');
+                });
+            });
+        }
+
+        function showModule(moduleNum) {
+            document.querySelectorAll('.module').forEach(m => m.classList.remove('active'));
+            if (moduleNum === 0) {
+                document.getElementById('startScreen').classList.add('active');
+                document.getElementById('currentModuleName').textContent = 'Welcome';
+            } else {
+                document.getElementById(`module${moduleNum}`).classList.add('active');
+                const moduleNames = ['', 'Vocabulary: PPE & Tools', 'Vocabulary: Definitions', 'Using Words in Context', 'Grammar: Present Simple', 'Reading Comprehension', 'Writing Task', 'Certificate'];
+                document.getElementById('currentModuleName').textContent = moduleNames[moduleNum];
+                
+                // Reset Module 1 quiz section when entering
+                if (moduleNum === 1) {
+                    document.getElementById('quizSection').classList.remove('active');
+                    document.getElementById('startQuizBtn').style.display = 'block';
+                    
+                    // Reset all flashcards to front side
+                    document.querySelectorAll('.flashcard').forEach(card => {
+                        card.classList.remove('flipped');
+                    });
+                }
+            }
+            currentModule = moduleNum;
+        }
+
+        function checkModule1() {
+            let correct = 0;
+            const total = module1Data.length;
+            
+            module1Data.forEach((item, index) => {
+                const selected = document.querySelector(`input[name="q${index}"]:checked`);
+                const options = document.querySelectorAll(`[data-question="${index}"]`);
+                
+                options.forEach(opt => {
+                    opt.classList.remove('correct', 'incorrect');
+                });
+                
+                if (selected) {
+                    const answer = parseInt(selected.value);
+                    if (answer === item.answer) {
+                        correct++;
+                        options[answer].classList.add('correct');
+                    } else {
+                        options[answer].classList.add('incorrect');
+                        options[item.answer].classList.add('correct');
+                    }
+                } else {
+                    options[item.answer].classList.add('correct');
+                }
+            });
+            
+            const percentage = Math.round((correct / total) * 100);
+            moduleScores.module1.score = percentage;
+            moduleScores.module1.attempts++;
+            
+            showFeedback('module1', correct, total, percentage);
+            
+            if (percentage >= 85) {
+                moduleScores.module1.completed = true;
+                document.getElementById('module1Next').disabled = false;
+            }
+            
+            updateProgress();
+        }
+
+        function checkModule2() {
+            let correct = 0;
+            const total = module2Data.length;
+            
+            module2Data.forEach((item, index) => {
+                const input = document.getElementById(`m2q${index}`);
+                const userAnswer = input.value.trim().toLowerCase();
+                const correctAnswer = item.answer.toLowerCase();
+                
+                if (userAnswer === correctAnswer) {
+                    correct++;
+                    input.style.borderColor = '#28a745';
+                    input.style.background = '#d4edda';
+                } else {
+                    input.style.borderColor = '#dc3545';
+                    input.style.background = '#f8d7da';
+                }
+            });
+            
+            const percentage = Math.round((correct / total) * 100);
+            moduleScores.module2.score = percentage;
+            moduleScores.module2.attempts++;
+            
+            showFeedback('module2', correct, total, percentage);
+            
+            if (percentage >= 85) {
+                moduleScores.module2.completed = true;
+                document.getElementById('module2Next').disabled = false;
+            }
+            
+            updateProgress();
+        }
+
+        function checkModule3() {
+            let correct = 0;
+            const total = module3Data.length;
+            
+            module3Data.forEach((item, index) => {
+                const selected = document.querySelector(`input[name="m3q${index}"]:checked`);
+                const options = document.querySelectorAll(`[data-question="${index}"]`);
+                
+                options.forEach(opt => {
+                    opt.classList.remove('correct', 'incorrect');
+                });
+                
+                if (selected) {
+                    const answer = parseInt(selected.value);
+                    if (answer === item.answer) {
+                        correct++;
+                        options[answer].classList.add('correct');
+                    } else {
+                        options[answer].classList.add('incorrect');
+                        options[item.answer].classList.add('correct');
+                    }
+                } else {
+                    options[item.answer].classList.add('correct');
+                }
+            });
+            
+            const percentage = Math.round((correct / total) * 100);
+            moduleScores.module3.score = percentage;
+            moduleScores.module3.attempts++;
+            
+            showFeedback('module3', correct, total, percentage);
+            
+            if (percentage >= 85) {
+                moduleScores.module3.completed = true;
+                document.getElementById('module3Next').disabled = false;
+            }
+            
+            updateProgress();
+        }
+
+        function checkModule4() {
+            let correct = 0;
+            const total = module4Data.length;
+            
+            module4Data.forEach((item, index) => {
+                const input = document.getElementById(`m4q${index}`);
+                const userAnswer = input.value.trim().toLowerCase();
+                const acceptableAnswers = item.answer.toLowerCase().split('|');
+                
+                if (acceptableAnswers.some(ans => userAnswer === ans)) {
+                    correct++;
+                    input.style.borderColor = '#28a745';
+                    input.style.background = '#d4edda';
+                } else {
+                    input.style.borderColor = '#dc3545';
+                    input.style.background = '#f8d7da';
+                }
+            });
+            
+            const percentage = Math.round((correct / total) * 100);
+            moduleScores.module4.score = percentage;
+            moduleScores.module4.attempts++;
+            
+            showFeedback('module4', correct, total, percentage);
+            
+            if (percentage >= 85) {
+                moduleScores.module4.completed = true;
+                document.getElementById('module4Next').disabled = false;
+            }
+            
+            updateProgress();
+        }
+
+        function checkModule5() {
+            let correct = 0;
+            const total = module5Data.length;
+            
+            module5Data.forEach((item, index) => {
+                const selected = document.querySelector(`input[name="m5q${index}"]:checked`);
+                const options = document.querySelectorAll(`[data-question="${index}"]`);
+                
+                options.forEach(opt => {
+                    opt.classList.remove('correct', 'incorrect');
+                });
+                
+                if (selected) {
+                    const answer = parseInt(selected.value);
+                    if (answer === item.answer) {
+                        correct++;
+                        options[answer].classList.add('correct');
+                    } else {
+                        options[answer].classList.add('incorrect');
+                        options[item.answer].classList.add('correct');
+                    }
+                } else {
+                    options[item.answer].classList.add('correct');
+                }
+            });
+            
+            const percentage = Math.round((correct / total) * 100);
+            moduleScores.module5.score = percentage;
+            moduleScores.module5.attempts++;
+            
+            showFeedback('module5', correct, total, percentage);
+            
+            if (percentage >= 85) {
+                moduleScores.module5.completed = true;
+                document.getElementById('module5Next').disabled = false;
+            }
+            
+            updateProgress();
+        }
+
+        function checkModule6() {
+            const writing = document.getElementById('writingAnswer').value.trim();
+            const wordCount = writing.split(/\s+/).filter(w => w.length > 0).length;
+            
+            moduleScores.module6.attempts++;
+            
+            if (wordCount < 80) {
+                showFeedbackMessage('module6', 'Please write at least 80 words. Current word count: ' + wordCount + ' / الرجاء كتابة 80 كلمة على الأقل', 'warning');
+                return;
+            }
+            
+            // Check for key vocabulary
+            const keyWords = ['helmet', 'gloves', 'goggles', 'electrician', 'safety', 'wire', 'tools', 'protection'];
+            const foundWords = keyWords.filter(word => writing.toLowerCase().includes(word));
+            
+            if (foundWords.length < 5) {
+                showFeedbackMessage('module6', 'Please include more PPE and tool vocabulary from the lesson (at least 5 items). / الرجاء تضمين المزيد من مفردات معدات الوقاية والأدوات', 'warning');
+                return;
+            }
+            
+            // Assign score based on completion
+            const percentage = 100;
+            moduleScores.module6.score = percentage;
+            moduleScores.module6.completed = true;
+            
+            showFeedbackMessage('module6', '🎉 Excellent work! Your writing demonstrates good understanding of PPE vocabulary and Present Simple tense. / عمل ممتاز! كتابتك تظهر فهماً جيداً', 'success');
+            
+            document.getElementById('module6Next').disabled = false;
+            updateProgress();
+        }
+
+        function showFeedback(module, correct, total, percentage) {
+            const feedback = document.getElementById(`${module}Feedback`);
+            feedback.classList.remove('success', 'error', 'warning');
+            feedback.classList.add('show');
+            
+            let message = '';
+            let className = '';
+            
+            if (percentage >= 85) {
+                className = 'success';
+                message = `🎉 Excellent! You scored ${correct}/${total} (${percentage}%). You can proceed to the next module! / ممتاز! حصلت على ${percentage}٪`;
+            } else {
+                className = 'warning';
+                message = `📚 You scored ${correct}/${total} (${percentage}%). You need 85% to continue. Please review and try again! / حصلت على ${percentage}٪. تحتاج إلى 85٪ للمتابعة`;
+            }
+            
+            feedback.className = `feedback show ${className}`;
+            feedback.innerHTML = message;
+        }
+
+        function showFeedbackMessage(module, message, type) {
+            const feedback = document.getElementById(`${module}Feedback`);
+            feedback.classList.remove('success', 'error', 'warning');
+            feedback.classList.add('show', type);
+            feedback.innerHTML = message;
+        }
+
+        function nextModule(moduleNum) {
+            showModule(moduleNum);
+            window.scrollTo(0, 0);
+        }
+
+        function previousModule(moduleNum) {
+            showModule(moduleNum);
+            window.scrollTo(0, 0);
+        }
+
+        function updateProgress() {
+            const completed = Object.values(moduleScores).filter(m => m.completed).length;
+            const progress = Math.round((completed / 6) * 100);
+            
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('progressFill').textContent = progress + '%';
+            
+            const totalPoints = Object.values(moduleScores).reduce((sum, m) => sum + m.score, 0);
+            document.getElementById('totalPoints').textContent = totalPoints;
+            document.getElementById('modulesCompleted').textContent = `${completed}/6`;
+            
+            // Show certificate if all modules completed
+            if (completed === 6) {
+                setTimeout(() => {
+                    showModule(7);
+                    displayCertificate();
+                }, 1000);
+            }
+        }
+
+        function displayCertificate() {
+            document.getElementById('certificateName').textContent = studentName;
+            document.getElementById('certificateTeacher').textContent = teacherName;
+            const totalScore = Object.values(moduleScores).reduce((sum, m) => sum + m.score, 0);
+            const avgScore = Math.round(totalScore / 6);
+            document.getElementById('finalScore').textContent = avgScore + '%';
+            
+            const today = new Date();
+            const dateStr = today.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+            document.getElementById('certificateDate').textContent = dateStr;
+        }
+
+        function downloadCertificate() {
+            alert('Certificate download feature: In a real implementation, this would generate a PDF certificate. For now, please take a screenshot of your certificate! 📸');
+        }
+
+        function restartLesson() {
+            if (confirm('Are you sure you want to restart the lesson? All progress will be lost. / هل أنت متأكد من إعادة بدء الدرس؟')) {
+                moduleScores = {
+                    module1: { completed: false, score: 0, attempts: 0 },
+                    module2: { completed: false, score: 0, attempts: 0 },
+                    module3: { completed: false, score: 0, attempts: 0 },
+                    module4: { completed: false, score: 0, attempts: 0 },
+                    module5: { completed: false, score: 0, attempts: 0 },
+                    module6: { completed: false, score: 0, attempts: 0 }
+                };
+                currentModule = 0;
+                studentName = '';
+                teacherName = '';
+                document.getElementById('studentName').value = '';
+                document.getElementById('teacherName').value = '';
+                showModule(0);
+                updateProgress();
+                
+                // Hide reset button
+                document.getElementById('resetButton').style.display = 'none';
+                
+                // Reset Module 1 flashcards and quiz visibility
+                document.getElementById('quizSection').classList.remove('active');
+                document.getElementById('startQuizBtn').style.display = 'block';
+                document.querySelectorAll('.flashcard').forEach(card => {
+                    card.classList.remove('flipped');
+                });
+                
+                // Reset all inputs
+                document.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
+                document.querySelectorAll('.input-answer').forEach(i => {
+                    i.value = '';
+                    i.style.borderColor = '';
+                    i.style.background = '';
+                });
+                document.getElementById('writingAnswer').value = '';
+                document.querySelectorAll('.option').forEach(o => {
+                    o.classList.remove('selected', 'correct', 'incorrect');
+                });
+                document.querySelectorAll('.feedback').forEach(f => f.classList.remove('show'));
+                document.querySelectorAll('[id$="Next"]').forEach(btn => btn.disabled = true);
+            }
+        }
+
+        function flipCard(index) {
+            const card = document.getElementById(`flashcard${index}`).parentElement;
+            card.classList.toggle('flipped');
+        }
+
+        function startModule1Quiz() {
+            document.getElementById('quizSection').classList.add('active');
+            document.getElementById('startQuizBtn').style.display = 'none';
+            
+            // Scroll to quiz section
+            document.getElementById('quizSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Initialize on load
+        window.onload = function() {
+            showModule(0);
+        };
+    </script>
+</body>
+</html>
